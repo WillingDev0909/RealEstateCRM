@@ -7,6 +7,12 @@ const port = 5000
 require('dotenv').config()
 const fs = require('fs');
 const path = require('path');
+const Grid = require("gridfs-stream")
+const mongoose = require("mongoose")
+
+const { MongoClient, ObjectId, GridFSBucket } = require('mongodb');
+
+
 
 //Setup Express App
 const app = express();
@@ -16,6 +22,7 @@ app.use(bodyParser.json());
 app.use(cors())
 //API Routes
 app.use('/api', route);
+
 
 
 app.get('/', async (req, res) => {
