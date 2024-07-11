@@ -3,7 +3,7 @@ const db = require('./db/config')
 const route = require('./controllers/route');
 const bodyParser = require('body-parser');
 const cors = require('cors');
-const port = 5001
+const port = 5000
 require('dotenv').config()
 const fs = require('fs');
 const path = require('path');
@@ -24,67 +24,6 @@ app.use(cors())
 app.use('/api', route);
 
 
-// let gfs;
-// const conn = mongoose.connection;
-// conn.once('open', () => {
-//     gfs = Grid(conn.db, mongoose.mongo);
-//     gfs.collection("outSales")
-// })
-let gfsBucket;
-const conn = mongoose.connection;
-conn.once('open', () => {
-    gfsBucket = new GridFSBucket(conn.db, {
-        bucketName: 'outSales'
-    });
-    console.log('GridFSBucket connected');
-});
-
-
-app.get("/file/:fileName", async (req, res) => {
-    try {
-        // const file = await gfs.files.findOne({ filename: req.params.fileName });
-        // console.log("file--::", file)
-        // const readStrean = gfs.createReadStream(file.filename)
-        // console.log("readStrean--::", readStrean)
-        // readStrean.pipe(res)
-
-        const files = await conn.db.collection('outSales.files').find().toArray();
-
-        if (!files || files.length === 0) {
-            return res.status(404).send('No files found');
-        }
-
-        res.setHeader('Content-Type', 'application/octet-stream');
-
-        files.forEach(async (file) => {
-            const readStream = gfsBucket.openDownloadStream(file._id);
-            readStream.pipe(res, { end: false });
-        });
-
-        res.end();
-
-
-        // const fileName = req.params.fileName;
-        // const file = await conn.db.collection('outSales.files').findOne({ filename: fileName });
-
-        // if (!file) {
-        //     return res.status(404).send('File not found');
-        // }
-
-        // const readStream = gfsBucket.openDownloadStreamByName(fileName);
-        // readStream.on('error', (err) => {
-        //     console.error('Error in readStream:', err);
-        //     res.status(500).send('Error retrieving file');
-        // });
-
-        // res.setHeader('Content-Type', file.contentType);
-        // readStream.pipe(res);
-
-    } catch (e) {
-        res.send("not found")
-        console.log("Error : ", e)
-    }
-})
 
 app.get('/', async (req, res) => {
     res.send('Welcome to my world...')
@@ -102,6 +41,6 @@ const server = app.listen(port, () => {
 
 // Connect to MongoDB
 const DATABASE_URL = process.env.DB_URL || 'mongodb://127.0.0.1:27017'
-const DATABASE = process.env.DB || 'Prolink'
+const DATABASE = process.env.DB || 'Real-E-State'
 
 db(DATABASE_URL, DATABASE);
